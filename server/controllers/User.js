@@ -13,20 +13,55 @@ exports.login = (req, res) => {
   res.render("login");
 };
 
-exports.users = (req, res) => {
+exports.dashboard = (req, res) => {
+  res.render("dashboard");
+};
+
+exports.teachers = (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) throw err;
 
-    connection.query("SELECT * FROM user", (err, rows) => {
+    connection.query("SELECT * FROM user WHERE role = 'TEACHER' AND deleted = 0 ", (err, rows) => {
       connection.release();
       if (err) {
         console.log(err);
       } else {
-        res.render("home", { rows });
+        res.render("users", { rows });
       }
     });
   });
 };
+
+exports.students = (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) throw err;
+
+    connection.query("SELECT * FROM user WHERE role = 'STUDENT' AND deleted = 0 ", (err, rows) => {
+      connection.release();
+      if (err) {
+        console.log(err);
+      } else {
+        res.render("users", { rows });
+      }
+    });
+  });
+};
+
+exports.admins = (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) throw err;
+
+    connection.query("SELECT * FROM user WHERE role = 'ADMIN' AND deleted = 0 ", (err, rows) => {
+      connection.release();
+      if (err) {
+        console.log(err);
+      } else {
+        res.render("users", { rows });
+      }
+    });
+  });
+};
+
 
 exports.find = (req, res) => {
   pool.getConnection((err, connection) => {

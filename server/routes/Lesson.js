@@ -4,11 +4,7 @@ const User = require("../controllers/User");
 
 router.get("/",User.login);
 router.get("/dashboard", User.dahsboard);
-router.get("/teacher", User.teachers);
-router.get("/student", User.students);
-router.get("/admin", User.admins);
-
-router.post("/teacher", User.find);
+router.post("/", User.find);
 router.get("/:id", User.delete);
 router.get("/adduser", User.form);
 router.post("/adduser", User.create);
