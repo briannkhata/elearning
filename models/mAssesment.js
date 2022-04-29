@@ -1,4 +1,4 @@
-const sql = require("db.js");
+const sql = require("./db.js");
 const assesment = function (assesment) {
   this.assesment = assesment.title;
   this.description = assesment.description;

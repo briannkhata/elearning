@@ -1,4 +1,4 @@
-const sql = require("db.js");
+const sql = require("./db.js");
 const Lesson = function (Lesson) {
   this.title = Lesson.title;
   this.description = Lesson.description;
@@ -20,7 +20,7 @@ Lesson.create = (newLesson, result) => {
 };
 
 Lesson.findById = (id, result) => {
-  sql.query(`SELECT * FROM tbl_lessons WHERE id = ${id}`, (err, res) => {
+  sql.query(`SELECT * FROM tbl_lessons WHERE lesson_id = ${id}`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);

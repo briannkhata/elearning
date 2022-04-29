@@ -1,16 +1,13 @@
 const express = require("express");
 const cors = require("cors");
-require("./routes/routes.js");
-
 const app = express();
+require("./routes/assesment_routes.js")(app);
+require("./routes/grade_routes.js")(app);
+require("./routes/lesson_routes.js")(app);
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to elearning api" });
-});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
