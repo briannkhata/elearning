@@ -32,7 +32,6 @@ Lesson.findById = (id, result) => {
       result(null, res[0]);
       return;
     }
-    // not found Lesson with the id
     result({ kind: "not_found" }, null);
   });
 };
@@ -55,8 +54,15 @@ Lesson.getAll = (title, result) => {
 
 Lesson.updateById = (id, Lesson, result) => {
   sql.query(
-    "UPDATE tbl_lessons SET title = ?, description = ?, published = ? WHERE id = ?",
-    [Lesson.title, Lesson.description, Lesson.published, id],
+    "UPDATE tbl_lessons SET title = ?, description = ?, grade_id = ? , date_added = ?, added_by = ? WHERE lesson_id = ?",
+    [
+      Lesson.title,
+      Lesson.description,
+      Lesson.grade_id,
+      Lesson.date_uploaded,
+      Lesson.uploaded_by,
+      id,
+    ],
     (err, res) => {
       if (err) {
         console.log("error: ", err);
@@ -64,7 +70,6 @@ Lesson.updateById = (id, Lesson, result) => {
         return;
       }
       if (res.affectedRows == 0) {
-        // not found Lesson with the id
         result({ kind: "not_found" }, null);
         return;
       }
@@ -73,15 +78,15 @@ Lesson.updateById = (id, Lesson, result) => {
     }
   );
 };
+
 Lesson.remove = (id, result) => {
-  sql.query("DELETE FROM tbl_lessons WHERE id = ?", id, (err, res) => {
+  sql.query("DELETE FROM tbl_lessons WHERE lesson_id = ?", id, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
       return;
     }
     if (res.affectedRows == 0) {
-      // not found Lesson with the id
       result({ kind: "not_found" }, null);
       return;
     }
@@ -89,15 +94,5 @@ Lesson.remove = (id, result) => {
     result(null, res);
   });
 };
-Lesson.removeAll = (result) => {
-  sql.query("DELETE FROM tbl_lessons", (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
-      return;
-    }
-    console.log(`deleted ${res.affectedRows} tbl_lessons`);
-    result(null, res);
-  });
-};
+
 module.exports = Lesson;
