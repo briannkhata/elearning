@@ -1,176 +1,89 @@
-const { redirect } = require("express/lib/response");
-const mysql = require("mysql");
-
-const pool = mysql.createPool({
-  connectionLimit: 100,
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-});
-
-exports.login = (req, res) => {
-  res.render("login");
-};
-
-exports.users = (req, res) => {
-  pool.getConnection((err, connection) => {
-    if (err) throw err;
-
-    connection.query("SELECT * FROM user", (err, rows) => {
-      connection.release();
-      if (err) {
-        console.log(err);
-      } else {
-        res.render("home", { rows });
-      }
-    });
-  });
-};
-
-exports.find = (req, res) => {
-  pool.getConnection((err, connection) => {
-    if (err) throw err;
-    let searchTerm = req.body.search;
-    connection.query(
-      "SELECT * FROM user WHERE first_name LIKE ? OR last_name LIKE ?",
-      ["%" + searchTerm + "%", "%" + searchTerm + "%"],
-      (err, rows) => {
-        connection.release();
-        if (err) {
-          console.log(err);
-        } else {
-          res.render("home", { rows });
-        }
-      }
-    );
-  });
-};
-
-exports.form = (req, res) => {
-  res.render("add-user");
-};
+const Assesment = require("../models/mAssesment.js");
 
 exports.create = (req, res) => {
-  const { first_name, last_name, email, phone, comments } = req.body;
+  if (!req.body) {
+    res.status(400).send({
+      message: "Fill All fields!",
+    });
+  }
+  const Assesment = new Assesment({
+    assesment: req.body.assesment,
+    date_added: req.body.date_added,
+    due_date: req.body.due_date,
+  });
 
-  pool.getConnection((err, connection) => {
-    if (err) throw err;
-    connection.query(
-      "INSERT INTO user SET first_name = ?, last_name = ?,phone = ?,email = ?,comments = ?",
-      [first_name, last_name, phone, email, comments],
-      (err, rows) => {
-        connection.release();
-        if (err) {
-          console.log(err);
-        } else {
-          res.render("add-user", { alert: "User saved successfully!" });
-        }
-      }
-    );
+  Assesment.create(Assesment, (err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while creating the Assesment.",
+      });
+    else res.send(data);
   });
 };
 
-exports.edit = (req, res) => {
-  pool.getConnection((err, connection) => {
-    if (err) throw err;
+exports.findAll = (req, res) => {
+  const title = req.query.title;
+  Assesment.getAll(title, (err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving Assesments.",
+      });
+    else res.send(data);
+  });
+};
 
-    connection.query(
-      "SELECT * FROM user WHERE id=?",
-      [req.params.id],
-      (err, rows) => {
-        connection.release();
-        if (err) {
-          console.log(err);
-        } else {
-          res.render("edit-user", { rows });
-        }
+exports.findOne = (req, res) => {
+  Assesment.findById(req.params.id, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found Assesment with id ${req.params.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Error retrieving Assesment with id " + req.params.id,
+        });
       }
-    );
+    } else res.send(data);
   });
 };
 
 exports.update = (req, res) => {
-  const { first_name, last_name, email, phone, comments } = req.body;
-
-  pool.getConnection((err, connection) => {
-    if (err) throw err;
-    let searchTerm = req.body.search;
-    connection.query(
-      "UPDATE user SET first_name = ?, last_name = ?,phone = ?,email = ?,comments = ? WHERE id=?",
-      [first_name, last_name, phone, email, comments, req.params.id],
-      (err, rows) => {
-        connection.release();
-        if (err) {
-          console.log(err);
-        } else {
-          connection.query("SELECT * FROM user", (err, rows) => {
-            res.render("home", { alert: "User updated successfully!", rows });
-          });
-        }
+  if (!req.body) {
+    res.status(400).send({
+      message: "Fill all fields!",
+    });
+  }
+  console.log(req.body);
+  Assesment.updateById(req.params.id, new Assesment(req.body), (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found Assesment with id ${req.params.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Error updating Assesment with id " + req.params.id,
+        });
       }
-    );
+    } else res.send(data);
   });
 };
 
 exports.delete = (req, res) => {
-  pool.getConnection((err, connection) => {
-    if (err) throw err;
-    let searchTerm = req.body.search;
-    connection.query(
-      "DELETE FROM user WHERE id = ?",
-      //"UPDATE user SET active = ? WHERE id = ?",
-      //['removed',req.params.id],
-      [req.params.id],
-      (err, rows) => {
-        connection.release();
-        if (err) {
-          console.log(err);
-        } else {
-          //redirect('/');
-          connection.query("SELECT * FROM user", (err, rows) => {
-            res.render("home", { alert: "User deleted successfully!", rows });
-          });
-        }
+  Assesment.remove(req.params.id, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found Assesment with id ${req.params.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Could not delete Assesment with id " + req.params.id,
+        });
       }
-    );
-  });
-};
-
-exports.signin = (req, res) => {
-  let username = req.body.username;
-  let password = req.body.password;
-
-  if (username && password) {
-    pool.getConnection((err, connection) => {
-      if (err) throw err;
-      connection.query(
-        "SELECT * FROM users WHERE username = ? AND password = ?",
-        [username, password],
-        (err, results, fields) => {
-          connection.release();
-          if (err) throw err;
-
-          if (results.length > 0) {
-            req.session.loggedin = true;
-            req.session.username = username;
-            res.redirect("users");
-          } else {
-            res.render("login", {
-              alert: "Wrong username and/or password!",
-            });
-          }
-        }
-      );
-    });
-  } else {
-    res.render("login", { alert: "Please enter Username and Password!" });
-  }
-};
-
-exports.logout = (req, res) => {
-  req.session.destroy(() => {
-    req.logout();
-    res.redirect("/"); //Inside a callback… bulletproof!
+    } else res.send({ message: `Assesment was deleted successfully!` });
   });
 };

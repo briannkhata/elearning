@@ -9,5 +9,13 @@ module.exports = (app) => {
   router.put("/:id", lessons.update);
   router.delete("/:id", lessons.delete);
 
+  //Grade routes
+  router.post("/", grades.create);
+  router.get("/", grades.findAll);
+  router.get("/:id", grades.findOne);
+  router.put("/:id", grades.update);
+  router.delete("/:id", grades.delete);
+
   app.use("/api/lessons", router);
+  app.use("/api/grades", router);
 };

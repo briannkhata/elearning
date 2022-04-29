@@ -1,7 +1,7 @@
 {
   "name": "elearning",
   "version": "1.0.0",
-  "description": "Its a platform for elearning for grade1 to grade college level",
+  "description": "Its a platform for elearning for grade 1 to college level",
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js"
@@ -11,7 +11,10 @@
     "url": "git+https://github.com/briannkhata/elearning.git"
   },
   "keywords": [
-    "elearning"
+    "elearning",
+    "nodejs",
+    "expressjs",
+    "reactjs"
   ],
   "author": "Brian Henry Nkhata",
   "license": "ISC",

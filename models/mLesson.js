@@ -1,5 +1,4 @@
 const sql = require("db.js");
-// constructor
 const Lesson = function (Lesson) {
   this.title = Lesson.title;
   this.description = Lesson.description;
